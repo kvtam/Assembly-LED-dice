@@ -1,45 +1,37 @@
+/*Kyle Tam
+ * UAF CS 301 project
+ * LED dice with an MSP430F5529LP
+ * C prototype
+ * Last Revised 10-5-2017
+*/
+
 #include <msp430.h>
 #include <MSP430F5529.h>
-#define BUTTON BIT1
-/**
- * blink.c
- */
-//define globals
-        volatile unsigned int i;
-        volatile unsigned int j=0x07;// volatile to prevent optimization
-     //   j=0x07;
+#define BUTTON BIT1                 //  The button on the launchpad is P1.1
 
 void main(void)
 {
-    WDTCTL = WDTPW | WDTHOLD;       // stop watchdog timer
-        P6DIR |= 0x7F;
-        P1IE |= BUTTON;
-      //  P6OUT &= 0x00;
+    WDTCTL = WDTPW | WDTHOLD;       // Stop watchdog timer
+        P6DIR |= 0x7F;              // Set all port 6 Pins 0-6 to outputs
+        P1IE |= BUTTON;             // Enable the button P1.1
+      P1REN |= BUTTON;              // Enable internal pull-up resistor
+      P1OUT |= BUTTON;              // Set button as an output
+    P1IFG &= ~BUTTON;               // Clear interrupt flag
+    __enable_interrupt();           // Enable the interrupt
 
-      P1REN |= BUTTON;
-      P1OUT |= BUTTON;
-    P1IFG &= ~BUTTON;
-    __enable_interrupt();
-
-    for(;;){
+    for(;;){                        // Main loop
     }
 }
-#pragma vector=PORT1_VECTOR
+#pragma vector=PORT1_VECTOR         // Set up interrupt vector
 __interrupt void Port_1(void){
-
-
-    //      for( j=0x07;j<=0xFF;j*=2){
-    //      P6OUT = j;              // toggle P1.0
-    //      for(i=1000000; i>0; i--);     // delay
-    //  }
-    //      for(j; j>0x00;j/=2){
-    //          P6OUT= j;
-    //          for(i=1000000; i>0; i--);
-    //      }
-  //
-  //P6OUT=0xFF;
-    srand(time(0));
-    switch(rand()%6+1){
+//    LED Breadboard enumeration of 7-pip display
+//
+//    [P6.5]            [P6.6]
+//    [P6.0]    [P6.2]  [P6.3]
+//    [P6.1]            [P6.4]
+//
+    srand(time(0));                //Seeded random function with time
+    switch(rand()%6+1){            //Switch on values 1-6
         case 1:
             P6OUT=0x04;
             break;
@@ -59,13 +51,8 @@ __interrupt void Port_1(void){
             P6OUT=0x7B;
             break;
         default:
-            printf("How the hell did you get here");
             break;
     }
-       P1IFG &= ~BUTTON;
-
-
-
-
+       P1IFG &= ~BUTTON;           // Clear interrupt flag
 }
 
