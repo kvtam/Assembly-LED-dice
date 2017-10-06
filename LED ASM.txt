@@ -1,0 +1,162 @@
+
+BSS SECTION UDATA0 [LOAD=NO]
+
+CODE SECTION ISR [LOAD=NO]
+
+                        	.ALIGN	BYTE[2]
+
+  __interrupt void Port_1(void){
+
+                        _Port_1
+                        	PUSH.W	R15
+                        	PUSH.W	R14
+                        	PUSH.W	R13
+                        	PUSH.W	R12
+                        @22
+
+      srand(time(0));                //Seeded random function with time
+
+                        	MOV.W	#0, R15
+                        	CALL	#_time
+                        	CALL	#_srand
+
+      switch(rand()%6+1){            //Switch on values 1-6
+
+                        	CALL	#_rand
+                        	MOV.W	#6, R14
+                        	CALL	#___int16_mod
+                        	ADD.W	#1, R15
+                        	SUB.W	#1, R15
+                        	CMP.W	#6, R15
+                        	JC	@23
+                        	ADD.W	R15, R15
+                        	BR	@24(R15)
+                        @24
+                        	DW	@25
+                        	DW	@26
+                        	DW	@27
+                        	DW	@28
+                        	DW	@29
+                        	DW	@30
+                        @31
+                        @25
+
+              P6OUT=0x04;
+
+                        	MOV.B	#4, &0x35
+
+              break;
+
+                        	JMP	@32
+                        @26
+
+              P6OUT=0x30;
+
+                        	MOV.B	#0x30, &0x35
+
+              break;
+
+                        	JMP	@32
+                        @27
+
+              P6OUT=0x34;
+
+                        	MOV.B	#0x34, &0x35
+
+              break;
+
+                        	JMP	@32
+                        @28
+
+              P6OUT=0x72;
+
+                        	MOV.B	#0x72, &0x35
+
+              break;
+
+                        	JMP	@32
+                        @29
+
+              P6OUT=0x76;
+
+                        	MOV.B	#0x76, &0x35
+
+              break;
+
+                        	JMP	@32
+                        @30
+
+              P6OUT=0x7B;
+
+                        	MOV.B	#0x7b, &0x35
+
+              break;
+
+                        	JMP	@32
+                        @23
+
+              break;
+
+                        	JMP	@32
+                        @33
+                        @32
+
+         P1IFG &= ~BUTTON;           // Clear interrupt flag
+
+                        	BIC.B	#2, &0x23
+                        @34
+                        	POP.W	R12
+                        	POP.W	R13
+                        	POP.W	R14
+                        	POP.W	R15
+                        	RETI
+                        @35
+
+
+CODE SECTION CODE [LOAD=NO]
+
+                        	.ALIGN	BYTE[2]
+
+  void main(void)
+
+                        _main
+                        @36
+
+      WDTCTL = WDTPW | WDTHOLD;       // Stop watchdog timer
+
+                        	MOV.W	#0x5a80, &0x120
+
+          P6DIR |= 0x7F;              // Set all port 6 Pins 0-6 to outputs
+
+                        	BIS.B	#0x7f, &0x36
+
+          P1IE |= BUTTON;             // Enable the button P1.1
+
+                        	BIS.B	#2, &0x25
+
+        P1OUT |= BUTTON;              // Set button as an output
+
+                        	BIS.B	#2, &0x21
+
+      P1IFG &= ~BUTTON;               // Clear interrupt flag
+
+                        	BIC.B	#2, &0x23
+
+      __enable_interrupt();           // Enable the interrupt
+
+                        	EINT
+                        @37
+                        @38
+                        @39
+                        @40
+                        	JMP	@37
+                        @41
+                        @42
+                        	RET
+                        @43
+
+
+CODE SECTION INTVEC [LOAD=NO]
+
+                        	ORG	8
+                        	DW	_Port_1
