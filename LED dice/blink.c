@@ -22,11 +22,9 @@ void main(void)
        WDTCTL = WDTPW | WDTHOLD;       // Stop watchdog timer
        P6DIR |= 0x7F;              // Set all port 6 Pins 0-6 to outputs
         P1IE |= BUTTON;             // Enable the button P1.1
-
        P1REN |= BUTTON;              // Enable internal pull-up resistor
        P1OUT |= BUTTON;              // Set button as an output
-     //  P1IFG &= ~BUTTON;               // Clear interrupt flag
-
+        
     _BIS_SR(LPM0_bits+GIE);         //Enter Low power mode 0 and open all interrupts
 }
 
