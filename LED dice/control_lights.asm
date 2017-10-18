@@ -1,9 +1,9 @@
+;Kyle Tam
+; Assembly function definition
 			.cdecls C,"msp430f5529.h";import the header for the msp
+			.def set_port			; Define the symbol
+			.text					; this section is runable code
 
-			.def set_port
-			.text
-
-set_port;
-			;bic.b #00h,&P6OUT
-			mov.b R12,&P6OUT
+set_port;							; section name
+			mov.b R12,&P6OUT		; move R12's value into port 6 where my LED's are
 			ret
